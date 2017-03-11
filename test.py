@@ -14,7 +14,7 @@ def getRestaurantInfo(url):
 	typeEncode = sys.getfilesystemencoding()
 	html = content.decode('utf-8').encode(typeEncode)
 	pattern = re.compile('0}}\",\"description\":(.*?),\"icon_color\".*?'+
-				'\"average_cost\":(.*?),.*?'+
+				'\"average_cost\":(.*?),\"(.*?)\":.*?'+
 				'float_minimum_order_amount.*?\"id\":(.*?),.*?'+
 				':-1,\"name\":(.*?),\"next_business_time\".*?'+
 				'\"order_lead_time\":(.*?),.*?'+
@@ -22,10 +22,20 @@ def getRestaurantInfo(url):
 				'\"rating\":(.*?),.*?'+
 				'\"recent_order_num\":(.*?),.*?',re.S)
 	items = re.findall(pattern,html)
-	# 0=优惠 1=人均消费 2=店名 3=配送时间 4=配送费 5=评分 6=月销量
+	# 0=优惠 1=人均消费 2=判断蜂鸟专送 3=id 4=店名 5=配送时间 6=配送费 7=评分 8=月销量
+	fengniao = "no"
 	for item in items:
-		print item[0],item[1],"id："+item[2],item[3],item[4]+"分钟",item[5],"评分："+item[6],"月销售："+item[7]
-		shopId.append(item[2])
+		if (item[2] == "description"):
+			fengniao = "no"
+		if (item[2] == "bidding"):
+			fengniao = "no"
+		if (item[2] == "delivery_mode"):
+			fengniao = "yes"
+		print item[0],item[1],"蜂鸟专送："+fengniao,"id："+item[3],item[4],item[5]+"分钟",item[6],"评分："+item[7],"月销售："+item[8]
+		#shopId.append(item[2])
+		#print item[4],"蜂鸟专送："+fengniao
+
+
 
 #抓取详细菜品信息
 def getFoodInfo(shopId):
