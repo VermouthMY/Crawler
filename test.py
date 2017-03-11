@@ -6,23 +6,31 @@ import urllib2
 import sys
 import re
 
-content=urllib2.urlopen('https://mainsite-restapi.ele.me/shopping/restaurants?extras%5B%5D=activities&geohash=wtw3qyjk6kx&latitude=31.19094&limit=24&longitude=121.59301&offset=0&terminal=web').read()
-typeEncode = sys.getfilesystemencoding()
-html = content.decode('utf-8').encode(typeEncode)
+shopId = []
 
-# print html
-
-pattern = re.compile('0}}\",\"description\":(.*?),\"icon_color\".*?'+
-				''+
+def getInfo(url):
+	content=urllib2.urlopen(url).read()
+	typeEncode = sys.getfilesystemencoding()
+	html = content.decode('utf-8').encode(typeEncode)
+	pattern = re.compile('0}}\",\"description\":(.*?),\"icon_color\".*?'+
+				'\"average_cost\":(.*?),.*?'+
+				'float_minimum_order_amount.*?\"id\":(.*?),.*?'+
 				':-1,\"name\":(.*?),\"next_business_time\".*?'+
-				'],\"tips\":(.*?)},\"promotion_info.*?',re.S)
-items = re.findall(pattern,html)
+				'\"order_lead_time\":(.*?),.*?'+
+				'],\"tips\":(.*?)},\"promotion_info.*?'+
+				'\"rating\":(.*?),.*?'+
+				'\"recent_order_num\":(.*?),.*?',re.S)
+	items = re.findall(pattern,html)
+	# 0=优惠 1=人均消费 2=店名 3=配送时间 4=配送费 5=评分 6=月销量
+	for item in items:
+		# print item[0],item[1],"id："+item[2],item[3],item[4]+"分钟",item[5],"评分："+item[6],"月销售："+item[7]
+		shopId.append(item[2])
 
-# 0=优惠 1=名称 2=配送费
 
+print "start geting Info..."
+getInfo("https://mainsite-restapi.ele.me/shopping/restaurants?extras%5B%5D=activities&geohash=wtw3qyjk6kx&latitude=31.19094&limit=24&longitude=121.59301&offset=0&terminal=web")
+print shopId
 
-for item in items:
-	print item[0],item[1],item[2]
 
 # fp=open(‘login.html’,’w’)
 # fp.write(content)
